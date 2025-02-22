@@ -20,11 +20,6 @@
         .game-container {
             margin-top: 20px;
         }
-        .question-container {
-            margin-bottom: 10px;
-            font-size: 18px;
-            font-weight: bold;
-        }
         input, button {
             margin: 10px;
             padding: 8px;
@@ -47,14 +42,9 @@ def show_message(message, is_red=False):
 def ask_question(question, callback):
     container = document["game-container"]
     container.clear()
-    
-    # Create question div
-    question_div = html.DIV(question, Class="question-container")
-    container <= question_div
-    
+    container <= html.P(question)
     input_box = html.INPUT(type="text")
     button = html.BUTTON("Submit")
-    
     container <= input_box + button
 
     def on_submit(event):
