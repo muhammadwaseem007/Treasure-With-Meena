@@ -17,126 +17,105 @@
             color: red;
             font-weight: bold;
         }
-        #game-container {
+        .game-container {
             margin-top: 20px;
         }
         input, button {
-            padding: 10px;
             margin: 10px;
+            padding: 8px;
+            font-size: 16px;
         }
     </style>
 </head>
 <body onload="brython()">
     <h1>Treasure Hunt Game</h1>
-    <div id="game-container"></div>
-    
+    <div id="game-output"></div>
+    <div class="game-container" id="game-container"></div>
+
     <script type="text/python">
 from browser import document, html
 
-def start_game(event):
-    game_container.clear()
-    game_container <= html.P("🎯 <span class='red-text'>Meena ❤️</span>, Your mission is to find the hidden treasure.", escape=False)
-    
-    anniversary_input = html.INPUT(type="text", placeholder="Enter anniversary date")
-    submit_btn = html.BUTTON("Submit", id="anniversary-btn")
-    
-    def check_anniversary(event):
-        if anniversary_input.value == "28":
-            game_container.clear()
-            game_container <= html.P("Correct. <span class='red-text'>Love ❤️</span> you too...", escape=False)
-            love_question()
-        else:
-            game_container.clear()
-            game_container <= html.P("Shurup! You are sent to jail. Game Over!")
-    
-    submit_btn.bind("click", check_anniversary)
-    game_container <= anniversary_input
-    game_container <= submit_btn
+def show_message(message, is_red=False):
+    color_class = "red-text" if is_red else ""
+    document["game-output"] <= html.P(message, Class=color_class, escape=False)
 
-def love_question():
-    game_container.clear()
-    game_container <= html.P("Do you love me? Yes or Yes")
-    love_input = html.INPUT(type="text", placeholder="Type Yes")
-    love_btn = html.BUTTON("Submit")
-    
-    def check_love(event):
-        if love_input.value.lower() == "yes":
-            game_container.clear()
-            game_container <= html.P("<span class='red-text'>Love ❤️</span> you more", escape=False)
-            path_choice()
-        else:
-            game_container.clear()
-            game_container <= html.P("Wrong answer. You are kissed to death by your man. 💋")
-    
-    love_btn.bind("click", check_love)
-    game_container <= love_input
-    game_container <= love_btn
+def ask_question(question, callback):
+    container = document["game-container"]
+    container.clear()
+    container <= html.P(question)
+    input_box = html.INPUT(type="text")
+    button = html.BUTTON("Submit")
+    container <= input_box + button
 
-def path_choice():
-    game_container.clear()
-    game_container <= html.P("Ok, you're on a path in an ancient jungle.")
-    game_container <= html.P("What do you choose? Left or Right")
+    def on_submit(event):
+        answer = input_box.value.strip().lower()
+        callback(answer)
     
-    path_input = html.INPUT(type="text", placeholder="Left or Right")
-    path_btn = html.BUTTON("Submit")
-    
-    def check_path(event):
-        if path_input.value.lower() == "left":
-            river_choice()
-        else:
-            game_container.clear()
-            game_container <= html.P("Game Over! There was a lion on the right.")
-    
-    path_btn.bind("click", check_path)
-    game_container <= path_input
-    game_container <= path_btn
+    button.bind("click", on_submit)
 
-def river_choice():
-    game_container.clear()
-    game_container <= html.P("There's a river in front. Wait for boat or Swim?")
-    
-    river_input = html.INPUT(type="text", placeholder="Wait or Swim")
-    river_btn = html.BUTTON("Submit")
-    
-    def check_river(event):
-        if river_input.value.lower() == "wait":
-            temple_choice()
-        else:
-            game_container.clear()
-            game_container <= html.P("The river was full of crocodiles. Game Over!")
-    
-    river_btn.bind("click", check_river)
-    game_container <= river_input
-    game_container <= river_btn
+treasure = """
+*******************************************************************************
+          |                   |                  |                     |
+ _________|________________.=""_;=.______________|_____________________|_______
+|                   |  ,-"_,=""     `"=.|                  |
+|___________________|__"=._o`"-._        `"=.______________|___________________
+          |                `"=._o`"=._      _`"=._                     |
+ _________|_____________________:=._o "=._."_.-="'"=.__________________|_______
+|                   |    __.--" , ; `"=._o." ,-"""-._ ".   |
+|___________________|_._"  ,. .` ` `` ,  `"-._"-._   ". '__|___________________
+          |           |o`"=._` , "` `; .". ,  "-._"-._; ;              |
+ _________|___________| ;`-.o`"=._; ." ` '`."\ ` . "-._ /_______________|_______
+|                   | |o ;    `"-.o`"=._``  '` " ,__.--o;   |
+|___________________|_| ;     (#) `-.o `"=.`_.--"_o.-; ;___|___________________
+____/______/______/___|o;._    "      `".o|o_.--"    ;o;____/______/______/____
+/______/______/______/"=._o--._        ; | ;        ; ;/______/______/______/_
+*******************************************************************************
+"""
 
-def temple_choice():
-    game_container.clear()
-    game_container <= html.P("You reached an ancient temple.")
-    game_container <= html.P("There are three doors: Yellow, Red, or Green. Make a choice.")
-    
-    door_input = html.INPUT(type="text", placeholder="Red, Yellow, or Green")
-    door_btn = html.BUTTON("Submit")
-    
-    def check_door(event):
-        if door_input.value.lower() == "red":
-            game_container.clear()
-            game_container <= html.P("Congratulations! You found the treasure! 🎉", escape=False)
-        elif door_input.value.lower() == "yellow":
-            game_container.clear()
-            game_container <= html.P("This room was full of FIRE. Game Over!")
-        elif door_input.value.lower() == "green":
-            game_container.clear()
-            game_container <= html.P("Green door led to a room full of snakes. Game Over!")
-        else:
-            game_container.clear()
-            game_container <= html.P("Invalid choice. Game Over!")
-    
-    door_btn.bind("click", check_door)
-    game_container <= door_input
-    game_container <= door_btn
+show_message("🎯 <span class='red-text'>Meena ❤️</span>, Your mission is to find the hidden treasure.", is_red=True)
 
-game_container = document["game-container"]
-start_game(None)
+def check_date(answer):
+    if answer == "28":
+        show_message("Correct. <span class='red-text'>Love ❤️</span> you too...", is_red=True)
+        ask_question("Before that. Do you love me? Yes or Yes", check_love)
+    else:
+        show_message("Shurup! You are sent to jail. Game Over!", is_red=True)
+
+def check_love(answer):
+    if answer == "yes":
+        show_message("<span class='red-text'>Love ❤️</span> you more", is_red=True)
+        show_message("Ok, you're on a path in an ancient jungle.")
+        ask_question("What do you choose? Left or Right", check_path)
+    else:
+        show_message("Wrong answer. You are kissed to death by your man. 💋", is_red=True)
+
+def check_path(answer):
+    if answer == "left":
+        ask_question("There's a river in front. Wait for boat or Swim?", check_river)
+    else:
+        show_message("Game Over <span class='red-text'>Love ❤️</span>! There was a lion on the right.", is_red=True)
+
+def check_river(answer):
+    if answer == "wait":
+        show_message("Great choice <span class='red-text'>Meena ❤️</span>, you are close to the treasure.", is_red=True)
+        show_message("You reached an ancient temple.")
+        ask_question("There are three doors: Yellow, Red, or Green. Make a choice.", check_doors)
+    else:
+        show_message("The river was full of crocodiles. Game Over <span class='red-text'>Love ❤️</span>!", is_red=True)
+
+def check_doors(answer):
+    if answer == "red":
+        show_message("Congratulations <span class='red-text'>Love ❤️</span>!", is_red=True)
+        show_message(f"<pre>{treasure}</pre>")
+        show_message("Great job my beautiful <span class='red-text'>Sapna ❤️</span>!", is_red=True)
+    elif answer == "yellow":
+        show_message("This room was full of FIRE. Game Over <span class='red-text'>Chubbo ❤️</span>!", is_red=True)
+    elif answer == "green":
+        show_message("Green door led to a room full of snakes. Game Over <span class='red-text'>Love ❤️</span>!", is_red=True)
+    else:
+        show_message("Invalid choice. Game Over!", is_red=True)
+
+ask_question("But first! What is our anniversary date? 27, 14, or 3", check_date)
     </script>
 </body>
 </html>
